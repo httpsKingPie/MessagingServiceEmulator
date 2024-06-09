@@ -136,11 +136,12 @@ local function GetEmulator()
     local SimulatedDataModel = GetSimulatedDataModel()
     --[=[
         @class MessagingServiceEmulator
+        @server
 
         An emulator for Roblox's MessagingService, because it is impossible to run multiple local servers at once.  
         This emulator can be used in place of MessagingService completely, because it returns the actual MessagingService for any non-Studio environment.
 
-        Tweak Settings in the sub-module (Settings) to simulate the amount of servers, 
+        Tweak Settings in the sub-module (Settings)
     ]=]
     local MessagingServiceEmulator = {
         ["__UID"] = SimulatedDataModel.JobId,
@@ -155,6 +156,7 @@ local function GetEmulator()
     --[=[
         @method GetSimulatedDataModel
         @within MessagingServiceEmulator
+        @server
 
         Returns an emulated replacement for the global DataModel (aka game).
 
@@ -171,6 +173,8 @@ local function GetEmulator()
     --[=[
         @method PublishAsync
         @within MessagingServiceEmulator
+        @server
+        @yields
 
         @param Topic string
         @param Message varaint
@@ -193,6 +197,17 @@ local function GetEmulator()
 
         Message["Data"] = MessageData
         Message["Sent"] = os.time()
+
+        --// Simulate error
+        local SimulatedErrorOccurred = CheckPercentageOccurrence(Settings["Failure Rate"])
+
+        if SimulatedErrorOccurred then
+            error("Simulated MessagingService error publishing message. Time sent: " .. Message.Sent .. "; Topic: " .. Topic .. "; MessageData: " .. Message.Data)
+        end
+
+        --// Simulate latency yield time (we are simulating how MessagingService:PublishAsync yields until the message is received by the backend.)
+        local MessageBackendReceiptLatencyTime = GetSimulatedLatencyTime()
+        task.wait(MessageBackendReceiptLatencyTime)
 
         local FiredSignal = false
 
@@ -220,6 +235,8 @@ local function GetEmulator()
     --[=[
         @method SubscribeAsync
         @within MessagingServiceEmulator
+        @server
+        @yields
 
         @param Topic string
         @param CallbackFunction function
@@ -229,6 +246,10 @@ local function GetEmulator()
         @return RBXScriptConnection
     ]=]
     function MessagingServiceEmulator:SubscribeAsync(Topic: string, CallbackFunction): RBXScriptConnection
+        --// Simulate latency yield time (we are simulating how MessagingService:SubscribeAsync yields until the subscription is properly registered and returns a connection object.)
+        local TopicSubscriptionLatencyTime = GetSimulatedLatencyTime()
+        task.wait(TopicSubscriptionLatencyTime)
+
         local InternalUID = MessagingServiceEmulator["__UID"]
 
         local TopicSignals = AllTopicSignals[Topic]
@@ -255,16 +276,16 @@ local function GetEmulator()
             local SimulatedErrorOccurred = CheckPercentageOccurrence(Settings["Failure Rate"])
 
             if SimulatedErrorOccurred then
-                error("Simulated MessagingService error. Time sent: " .. Message.Sent .. "; Topic: " .. Topic .. "; MessageData: " .. Message.Data)
+                error("Simulated MessagingService error receiving message. Time sent: " .. Message.Sent .. "; Topic: " .. Topic .. "; MessageData: " .. Message.Data)
             end
 
-            local LatencyTime = GetSimulatedLatencyTime()
-            task.wait(LatencyTime)
+            local MessageReceiptLatencyTime = GetSimulatedLatencyTime()
+            task.wait(MessageReceiptLatencyTime)
 
             if Settings["Debug Subscription"] then
                 local ServerName = if GetDisplayName(MessagingServiceEmulator.__UID) then MessagingServiceEmulator.__UID .. " (" .. GetDisplayName(MessagingServiceEmulator.__UID) .. ")" else MessagingServiceEmulator.__UID
 
-                print("[MessagingServiceEmulator] New message received by", ServerName, "after " .. tostring(LatencyTime) .. "s. Time sent " .. Message.Sent .. "; Topic: " .. Topic .. "; MessageData: ")
+                print("[MessagingServiceEmulator] New message received by", ServerName, "after " .. tostring(MessageReceiptLatencyTime) .. "s. Time sent " .. Message.Sent .. "; Topic: " .. Topic .. "; MessageData: ")
                 print(Message.Data)
             end
 
