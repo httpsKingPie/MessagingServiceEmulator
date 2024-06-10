@@ -60,8 +60,8 @@ return function()
 
         See documentation for [DataModel:IsLoaded]
     ]=]
-    function SimulatedDataModel:IsLoaded(...)
-        return game:IsLoaded(...) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+    function SimulatedDataModel:IsLoaded()
+        return game:IsLoaded() --// Method doesn't take arguments
     end
 
     --[=[
@@ -71,7 +71,7 @@ return function()
         See documentation for [DataModel:SetPlaceId]
     ]=]
     function SimulatedDataModel:SetPlaceId(...)
-        return game:SetPlaceId(...) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+        return game:SetPlaceId(...)
     end
 
     --[=[
@@ -81,7 +81,7 @@ return function()
         See documentation for [DataModel:SetUniverseId]
     ]=]
     function SimulatedDataModel:SetUniverseId(...)
-        return game:SetUniverseId(...) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+        return game:SetUniverseId(...)
     end
 
     --// ServiceProvider methods
@@ -93,7 +93,7 @@ return function()
         See documentation for [DataModel:FindService]
     ]=]
     function SimulatedDataModel:FindService(...)
-        return game:FindService(...) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+        return game:FindService(...)
     end
 
     --[=[
@@ -103,7 +103,7 @@ return function()
         See documentation for [DataModel:GetService]
     ]=]
     function SimulatedDataModel:GetService(...)
-        return game:GetService(...) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+        return game:GetService(...)
     end
 
     --// Custom methods
@@ -120,9 +120,7 @@ return function()
 
     setmetatable(SimulatedDataModel, {
         __index = function(Table, Index) --// Used for retrieving/reading game properties
-            local ActualDataModel = workspace.Parent
-
-            return ActualDataModel[Index]
+            return game[Index]
         end,
     })
 
