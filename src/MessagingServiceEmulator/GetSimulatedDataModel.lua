@@ -31,9 +31,7 @@ return function()
         See documentation for [DataModel:BindToClose]
     ]=]
     function SimulatedDataModel:BindToClose(...)
-        local Arguments = {...}
-
-        SimulateCloseSignal:Connect(table.unpack(Arguments)) --// Simulates BindToClose
+        SimulateCloseSignal:Connect(...) --// Simulates BindToClose
     end
 
     --[=[
@@ -42,10 +40,8 @@ return function()
 
         See documentation for [DataModel:GetJobsInfo]
     ]=]
-    function SimulatedDataModel:GetJobsInfo(...)
-        local Arguments = {...}
-
-        return game:GetJobsInfo(table.unpack(Arguments)) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+    function SimulatedDataModel:GetJobsInfo()
+        return game:GetJobsInfo() --// Method doesn't take arguments
     end
 
     --[=[
@@ -55,9 +51,7 @@ return function()
         See documentation for [DataModel:GetObjects]
     ]=]
     function SimulatedDataModel:GetObjects(...)
-        local Arguments = {...}
-
-        return game:GetObjects(table.unpack(Arguments)) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+        return game:GetObjects(...)
     end
 
     --[=[
@@ -66,10 +60,8 @@ return function()
 
         See documentation for [DataModel:IsLoaded]
     ]=]
-    function SimulatedDataModel:IsLoaded(...)
-        local Arguments = {...}
-
-        return game:IsLoaded(table.unpack(Arguments)) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+    function SimulatedDataModel:IsLoaded()
+        return game:IsLoaded() --// Method doesn't take arguments
     end
 
     --[=[
@@ -79,9 +71,7 @@ return function()
         See documentation for [DataModel:SetPlaceId]
     ]=]
     function SimulatedDataModel:SetPlaceId(...)
-        local Arguments = {...}
-
-        return game:SetPlaceId(table.unpack(Arguments)) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+        return game:SetPlaceId(...)
     end
 
     --[=[
@@ -91,9 +81,7 @@ return function()
         See documentation for [DataModel:SetUniverseId]
     ]=]
     function SimulatedDataModel:SetUniverseId(...)
-        local Arguments = {...}
-
-        return game:SetUniverseId(table.unpack(Arguments)) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+        return game:SetUniverseId(...)
     end
 
     --// ServiceProvider methods
@@ -105,9 +93,7 @@ return function()
         See documentation for [DataModel:FindService]
     ]=]
     function SimulatedDataModel:FindService(...)
-        local Arguments = {...}
-
-        return game:FindService(table.unpack(Arguments)) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+        return game:FindService(...)
     end
 
     --[=[
@@ -117,9 +103,7 @@ return function()
         See documentation for [DataModel:GetService]
     ]=]
     function SimulatedDataModel:GetService(...)
-        local Arguments = {...}
-
-        return game:GetService(table.unpack(Arguments)) --// This method doesn't take arguments, so this neither hurts or really does anything :/
+        return game:GetService(...)
     end
 
     --// Custom methods
@@ -130,15 +114,13 @@ return function()
 
         Simulates the DataModel closing and fires all functions bound via [SimulatedDataModel:BindToClose]
     ]=]
-    function SimulatedDataModel:SimulateClose(...)
+    function SimulatedDataModel:SimulateClose()
         SimulateCloseSignal:Fire()
     end
 
     setmetatable(SimulatedDataModel, {
         __index = function(Table, Index) --// Used for retrieving/reading game properties
-            local ActualDataModel = workspace.Parent
-
-            return ActualDataModel[Index]
+            return game[Index]
         end,
     })
 
